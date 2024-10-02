@@ -19,21 +19,28 @@ class PyplanetRoundPauseApp(AppConfig):
     async def on_start(self):
         await super().on_start()
 
-        await self.instance.command_manager.register(Command(
-            namespace="",
-            command="pause",
-            target=self.pause,
-            admin=True,
-            description="Pause the current round"
-        ))
-        await self.instance.command_manager.register(Command(
-            namespace="",
-            command="unpause",
-            aliases=["endpause", "resume"],
-            target=self.unpause,
-            admin=True,
-            description="Unpause"
-        ))
+        await self.instance.permission_manager.register("pause", description="Pause and unpause the running rounds",
+                                                        min_level=2, namespace="prp", app=self)
+
+        await self.instance.command_manager.register(
+            Command(
+                namespace="",
+                command="pause",
+                target=self.pause,
+                admin=True,
+                description="Pause the current round",
+                perms=["prp:pause"]
+            ),
+            Command(
+                namespace="",
+                command="unpause",
+                aliases=["endpause", "resume"],
+                target=self.unpause,
+                admin=True,
+                description="Unpause",
+                perms=["prp:pause"]
+            )
+        )
 
     async def on_stop(self):
         await super().on_stop()
